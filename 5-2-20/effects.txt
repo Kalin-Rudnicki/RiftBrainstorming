@@ -1,0 +1,44 @@
+
+Effect would be similar to Error, except you use a "!" instead
+
+So, back to the "writeToFile" function...
+
+```rift
+
+    def writeToFile(path: String, data: String): Unit!? = !???
+
+```
+
+The "?" represents that something might fail,
+and the "!" represents something effectful happened / might have happened
+
+I think it would be essential that the same "acknowledge" related behavior from "?" applies to "!" as well
+In the example earlier, we were forced to acknowledge the error if it did not effect the outcome of the function/method directly
+Technically looking back, I should really change the type to "?!".
+Let's assume for this example that "puts" is effectful, but cant fail
+Is that even possible? Can println technically fail?
+Anyway:
+
+```rift
+
+    def doEffect: Unit! =
+        println("doEffect") // Assuming that println cant error
+
+    def addPrintReturn_Invalid(i1: Int, i2: Int): Int! = {
+        res: Int = i1 + i2
+        puts("Result: $res") // Compile error: "!" not acknowledged
+        res
+    }
+
+    // Solution:
+
+    def addPrintReturn(i1: Int, i2: Int): Int! = {
+        res: Int = i1 + i2
+        acknowledge puts("Result: $res")
+        res
+    }
+
+```
+
+Note that acknowledge here has a slightly different meaning than when a "?" was involved.
+Before, it served the purpose of prematurely returning when an error occurs

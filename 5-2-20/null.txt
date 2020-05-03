@@ -1,0 +1,5 @@
+
+Null does not exist in rift
+
+Everything needs to be initialized with a value,
+or have some sort of UninitializedValue[T] thing going on

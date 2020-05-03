@@ -1,0 +1,46 @@
+
+I still really dont understand specifically how any of these work, or where they are all put to use in my previous ideas here.
+That being said, would it make sense that this sort of automatic unwraping could work for anything that follows certain rules?
+
+Ex:
+```rift
+
+    // Ex1
+
+    i1: Opt[Int] = 5 // We will assume this is ok to do
+    i2: Int = 5
+    i3: Opt[Int] = myAdd(i1, i2) // No sort of mapping on "i1" necessary
+
+    // Ex2
+
+    i4: Opt[Int] = 5
+    i5: Opt[Int] = 5
+    i6: Opt[Int] = myAdd(i4, i5)
+    i7: Opt[Int]? = mySub(i4, i5)
+
+    // Ex3 : More TBD?
+
+    i8: Opt[Int] = 5
+    i9: Either[String, Int] = 5 // This is kinda sketchy, but idk
+    i10: Opt[Either[String, Int]] = myAdd(i8, i9)
+    i10: Either[String, Opt[Int]] = myAdd(i9, i8)
+
+```
+
+That might end up being a little tricky to figure out when things can be combined, and when they cant...
+Specifically, I think it would be the hardest with something like:
+
+```rift
+
+i1: Opt[Int] = 5
+i2: Either[String, Int] = 5
+i3: Opt[Int] = 5
+// Not even going to try and guess the type:
+myAdd3(i1, i2, i3)
+
+```
+
+A note here on "?", would you ever have a "Opt[Int?]"
+I feel like the "?" should always be sucked to the outermost level if there are any "?" inside.
+I imagine something like "(Int?, String?)" would become "(Int, String)?",
+where, as mentioned with MaybeError[E, T], it would combine whatever possible errors E1/E2 have

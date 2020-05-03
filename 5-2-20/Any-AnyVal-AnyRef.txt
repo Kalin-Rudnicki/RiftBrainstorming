@@ -1,0 +1,21 @@
+
+Int on its own should essentially be able to stay as a raw C int
+Anything of "AnyVal" should follow this rule (char / short / int / long / float / double)
+TBD: Would it be possible to do the same with a rational? Maybe store it as 2 ints that is stored as a long under the hood?
+
+Anyway, back to the point, there should be no need for all of the extra bagage for references unless they are needed.
+In the case of something like:
+
+```rift
+def takeAny(any: Any): Unit = ???
+
+i: Int = 5
+takeAny(i)
+```
+
+Here, the Int would get wrapped in some sort of AnyValInt
+
+This makes me think that the type heirarchy would essentially be all of the value types being all off on their own floating island
+
+Then, you have AnyVal < Any, with AnyValInt < AnyVal, AnyValFloat < AnyVal ...
+and then you have implicit conversions from ___ to AnyVal___

@@ -1,0 +1,61 @@
+
+These are relatively simple enough, until you start being able to reference things in the current scope that are outside of the scope of the anonymous function
+
+I think I did some thinking on this before, but I think you end up needing to differentiate between savable and non-savable functions
+
+```rift
+
+    // Ex1:
+    // easy: no references otside of anonymous function scope
+    def ex1: Unit = {
+        [1, 2, 3].map(i => i + 2)
+    }
+
+    // Ex2:
+    // medium: read outside of anonymous function scope
+    def ex2: Unit = {
+        j: Int = 2
+        [1, 2, 3].map(i => i + j)
+    }
+
+    // Ex3:
+    // hard: write outside of function scope
+    def ex3: Unit = {
+        flexible s: Int = 0 // Just throwin the idea out there... things are final by default, and then flexible makes it non-final / var?
+        [1, 2, 3].map(i => s = s + i)
+    }
+
+```
+
+I think there are a few things to differentiate here how things need to happen.
+1) reference / read / write
+2) does the function need to be saved? (starting a new thread or using it in new thread makes this true, I believe)
+
+A simple example of this might be something like:
+
+```rift
+
+    class ActionThing {
+
+        flexible action: Opt[=> Unit] = None
+
+        def action= (action: Opt[=> Unit]): Opt[=> Unit] =
+            this.action = action
+        
+        def doAction: Unit =
+            this.action.each(f => f)
+
+    }
+
+```
+
+The "ActionThing" needs to hold on to the funciton, as you can see by it doing: "this.action = action"
+
+[No-Save]
+    [None] =>   N/A
+    [Read] =>   Value
+    [Write] =>  Pointer (of some sort... handled behind the scenes)
+[Save]
+    [None] =>   N/A
+    [Read] =>   Value
+    [Write] =>  Not allowed

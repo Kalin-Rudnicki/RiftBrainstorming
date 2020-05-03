@@ -1,0 +1,188 @@
+
+Rift has no actual exceptions.
+It handles exceptions via "?"
+
+A "T?" behaves exactly like a normal "T".
+You can "un-ignore" the auto-unwraping of the "?" with the unary "~".
+Unless you do this, you would have absolutely no clue that there is a possible error.
+
+Example:
+```rift
+
+    // =====| Functions |=====
+
+    def myAdd(i1: Int, i2: Int): Int =
+        i1 + i2
+
+    // I originally wanted to demonstrate this with "myDiv", but it would have "/", which itself would be a "?",
+    // which misses the point of creating the error ourselves
+    def mySub(i1: Int, i2: Int): Int? =
+        if (i2 == 0)
+            throw "Sub-0 Error"
+            // This would probably be much more well thought out, with some sort of exception
+            // Think of "throw" here kinda like: return Error("Sub-0 Error")
+        else
+            i1 - i2
+
+    // =====| Usage |=====
+
+    Int added1 = myAdd(5, 6) // => 11
+
+    added1: Int? = 5                // Knows how to automatically wrap this
+    added2: Int = myAdd(tmp, 6)     // Error: The error lies not in the fact that you tried to pass an Int? as an Int,
+                                    // but as it knows how to automatically handle this, so the result type is Int?
+    added3: Int? = myAdd(tmp, 6)    // Now that we acknowledged the "?" in the variable we saved myAdd(...) to, the types work out
+
+    sub1: Int? = mySub(mySub(5, 2), mySub(5, 2))    // => 0
+    sub2: Int? = mySub(mySub(5, 2), mySub(5, 0))    // => "Sub-0 Error"
+                                                    // This error is caused by the mySub(5, 0)
+    sub3: Int? = mySub(mySub(5, 2), mySub(5, 5))    // => "Sub-0 Error"
+                                                    // This is caused by the outer mySub trying to subtract the 0 result from the mySub(5, 5)
+
+    // Note, that even though sub2 and sub3 are errors at this point,
+    // it is totally fine to do this:
+    added4: Int? = myAdd(sub2, sub3)
+    // We just end up with an error
+
+    // Another important thing to note is that we dont end up with an "Int??" (I feel like this should almost be dis-allowed by the language)
+
+```
+
+TBD: Is it ok to have "?" types that dont affect the outcome of a method/function?
+(I really think this should not be allowed)
+Example:
+```rift
+
+    // Stub:
+    def writeToFile(path: String, data: String): Unit? = ???
+
+    def addAndSave(i1: Int, i2: Int, path: String): Int = {
+        res: Int = i1 + i2
+        writeToFile(path, res.toStr)
+        // This is of type "Unit?"
+        // A possible error happens, but it does not affect the result, allowing a non-"?" return type
+        res
+    }
+
+```
+
+A possible solution: (acknowledge)
+
+```rift
+
+    def addAndSave(i1: Int, i2: Int, path: String): Int = {
+        res: Int = i1 + i2
+        acknowledge writeToFile(path, res.toStr) 
+        res
+    }
+
+    // This is essentially what that would result in
+    // (which also gives me a chance to play around with what error handling might look like)
+
+
+    def addSaveReturn(i1: Int, i2: Int, path: String): Int = {
+        res: Int = i1 + i2
+        ~writeToFile(path, res.toStr) match { // Used the ~ to stop the "ignoring" of the "?" in the type
+            case Error(error) =>
+                throw error
+            case NonError(value) =>
+                value
+        }
+        res
+    }
+
+```
+
+I really like this...
+I think that given this, you could technically do something like:
+
+```rift
+
+    def test: Unit? = { // The "?" is important
+        res1: Int = acknowledge mySub(5, 0)
+        res2: Int = acknowledge mySub(4, 2)
+        res3: Int = acknowledge mySub(res1, res2)
+        res4: Int? = mySub(res1, res2)
+        // The last one requires "Int?", because the "?" was not acknowledged 
+    }
+
+```
+
+Now, there are a few things I would like to mention here:
+1) Obviously, the addSaveReturn is TERRIBLE FP
+2) "acknowledge" is kind of a long keyword, but I almost like that...
+   It forces you to really think everytime to have to write it, like...
+   should I really be using this here? Is there a better way?
+
+
+
+After working on a few of the other brainstorming files here, I realized what might be a problem.
+How to deal with something like a stack overflow, heap overflow, or something along those lines?
+
+I think something like that just causes a sort of un-catchable seg-fault type behavior (but much nicer, with much better labeling)
+
+
+
+On a separate note (almost going back to the start of this file):
+"(A => B)?" would hopefully work the same exact way,
+where you never need to reference the fact you might have encounered an error to get the function,
+and you can essentially call it normally, but if its an error, nothings really happening,
+and the error propegates
+
+Partial application of "?" yields a ? function
+
+```rift
+
+    // Normal partial application
+
+    def myAdd5_1: Int => Int =
+        myAdd <* 5
+
+    def myAdd5_2: Int => Int =
+        myAdd(5, _)
+
+    // Partial application with ?
+
+    def myAddMaybeError5_1: [Int => Int]? =
+        myAdd <* mySub(5, 0)
+    def myAddMaybeError5_2: [Int => Int]? =
+        myAdd(mySub(5, 0), _)
+
+    // Caller
+
+    res1: Int = myAdd5_1(10)
+    res2: Int = myAdd5_1 <* 10
+
+    res3: Int? = myAddMaybeError5_1(10)
+    res4: Int? = myAddMaybeError5_2 <* 10
+
+```
+
+Notice how the caller has no worries about whether the function is a "?" or not
+
+
+
+Under the hood, "T?" is really something along the lines of "MaybeError[E, T]", where E represents all the the errors that may have been accumulated
+an example of what E might be: "Div0Err | FileNotFoundError | HttpRequestError", or something along those lines
+
+Should it be allowed for you to un-ignore an error, and then handle it?
+
+```rift
+
+    ~res dismiss {
+        case IoError => puts("You had an IoError...")
+    }
+
+```
+
+There are a few things to note here:
+1) In the act of dismissing the IoError, you made an effectful call "puts"
+2) #1 is probably irrelivent, because if you have an IoError, youre almost certainly already forced into a "!" anyway
+3) That being said, if this call doesnt directly affect the output, it needs to be acknowledged
+    This could be done in the way of "acknowledge ~res dismiss ..." or "case IoError => acknowledge puts ..."
+
+
+This makes me think that it might be a problem to have acknowledge serve the dual purpose of propegating "?", and acknowledging "!".
+Just the way this that was naturally phased makes it seem like "propegate" would be a good
+reserved word for the previous definition of "acknowledge" in relation to "?",
+and "acknowledge" stays the same for "!"

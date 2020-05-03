@@ -1,0 +1,39 @@
+
+It is very important for me to have evals in my programming language
+If there is no dynamic code in a function/method, there is no need to keep track of anything a dynamic eval might need to work,
+but as soon as something like that happens, you keep track of the dynamic stuff, that simple.
+
+```rift
+
+    i: Int = 5
+    res: Any? = i..toStr // => "5"
+    resStr: String? = i..toStr.asInstanceOf[String] // => "5"
+    resInt: Int? = i..toStr.asInstanceOf[Int] // Error: "5" is not an Int
+    // TBD: Should all "." need to be ".." once you are in a dynamic call chain?
+    // Are there any special cases?
+    // Is it almost a warning if you do, because youve already made it clear you are fully dynamic at that point
+
+```
+Notice how cleanly the whole "?" paradigm fits in here?
+
+I forgot to mention it, but the ".." above is syntatic sugar for making a dyanmic method call
+Essentially something along the lines of: i.eval("toStr")
+
+Now, there is something to acknowledge: Effects
+You dont know if an effect could happen, so what do we do here?
+The solution is to have effectfulEval and effectlessEval
+I think just "eval" by default would be an alias to effectlessEval
+
+```rift
+
+    res1: Any!? = effectfulEval("callSomeEffectfulFunction") // => Unit!?
+    res2: Any? = effectfulEval("callSomeEffectfulFunction") // => Compile error, effectfulEval returns type "Any!?"
+    res3: Any? = effectlessEval("callSomeEffectfulFunction") // => Error: Attempted to run effectful function in effectlessEval
+
+```
+
+Note: A really nice thing about the "!" being forced to propegate up is that we would know as soon as we were going into something effectful,
+not once we are 15 levels deep in the stack trace
+
+".." would be syntatic sugar for effectlessEval,
+and "..." would be syntatic sugar for effectfulEval

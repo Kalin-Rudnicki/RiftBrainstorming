@@ -37,3 +37,41 @@ not once we are 15 levels deep in the stack trace
 
 ".." would be syntatic sugar for effectlessEval,
 and "..." would be syntatic sugar for effectfulEval
+
+
+Few ideas for evals
+
+```rift
+
+    // ".." could be "pureEval"
+    // "..." could allow for state and/or effect (TBD)
+
+    res.pureEval.toStr // => pureEval(res, toStr)
+
+    res.pureEval.toStr
+    res.stateEval.toStr
+    res.effectEval.toStr
+    res.stateEffectEval.toStr
+    // This makes me think that "..." should be "stateEffectEval"
+    // because the other ones really arent that bad to write
+
+```
+
+Should plain "eval" be a thing? If so, which should it represent?
+
+Again to mention, the super nice thing is you dont have to go down the rabbit-hole only to find out you arent allowed to do a "!" or "$"
+
+If you are smart about it, it should be possible to be able to tell, even in the case of something like:
+
+```rift
+
+res..a.b.c.d.e
+
+// And even
+
+res..a(b, c, d(e, f)).g(h, i(j))
+
+```
+
+This would essentially seemingly boil down to doing 1 big function composition
+You could eval the function name, find out its return type, and then use that to figure out what the next one in the line is

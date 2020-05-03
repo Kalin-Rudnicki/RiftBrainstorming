@@ -1,0 +1,14 @@
+
+Personally, I am more of a fan of the idea of reference counting that GC,
+plus it seems easier to implement.
+
+The idea of stuff hanging around unecessarily longer than it needs to really bothers me,
+and then you need to handle when you overflow, and that just way more complicated.
+With reference counting, if you overflow, you know that was the only option.
+
+
+The only thing Id like to note here is that you can clean something up as soon as you cant "reference" it anymore, except in 1 condition.
+If you are in a dynamic scope, you have to wait till you leave the scope, because you could always eval it.
+
+Wait... nvm, if you cant access it normally, how could you ever do it dynamically, silly me.
+Ive leave my thought process in here anyway, instead of deleting it.

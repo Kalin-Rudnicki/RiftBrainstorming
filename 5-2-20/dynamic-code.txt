@@ -65,9 +65,9 @@ If you are smart about it, it should be possible to be able to tell, even in the
 
 ```rift
 
-res..a.b.c.d.e
+    res..a.b.c.d.e
 
-// And even
+    // And even
 
 res..a(b, c, d(e, f)).g(h, i(j))
 
@@ -75,3 +75,13 @@ res..a(b, c, d(e, f)).g(h, i(j))
 
 This would essentially seemingly boil down to doing 1 big function composition
 You could eval the function name, find out its return type, and then use that to figure out what the next one in the line is
+
+
+
+It is very important to have read past the "-----" in state.txt to get this part:
+
+I dont think there needs to be 4 evals at all anymore, just 2:
+1) effectlessEval : ".."
+2) effectfulEval : "..."
+
+The only time that state comes into play, is when you try and save the result, or pass a value dynamically

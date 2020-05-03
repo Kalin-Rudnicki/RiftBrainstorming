@@ -123,3 +123,61 @@ At that point, I think its probably getting too complex?
 This makes me think that the "$" / "#" is a good idea...
 
 There must be some sound logic here as to being able to reason about this.
+
+
+
+-----
+
+I think it is good to use "$" / "#".
+1) "$" represents "my state will be modified", and goes only on parameters
+2) "#" represents "my state .....
+
+Now that I think about it, maybe it doesnt make sense...
+Maybe it just makes sense to use "$" everywhere
+1) def test(person: Person$) ...
+    Says that person might have something about its state changed
+    Note that this will not compile unless something actually attempts to change person's state
+2) def test: Person$ ...
+    Says that it is ok to change the state of the person returned from this function
+3) person: Person$ = ...
+    Says that it is ok to modify the state of this thing
+
+
+It is always to to assign a ___$ to a ___, but never ok to assign as ___ to a ___$
+
+I believe with these evolutions of ideas, it is no longer essential, or even desired, to have "acknowledge" having anything to do with "$"
+The "$" in the parameters "acknowledges" that the state of that thing will/might change 
+
+I think that using variable names as ___$ is a nice way to reflect whether or not the variable is final, and then "$" on the type says whether the type can be internally modified.
+
+I think you would need multiple verions of the standard library to make this work out, because I dont think you can model this in a consistent way with types.
+Lets say you have:
+
+```rift
+
+class Person(firstName: String, lastName$: String, birthday: Date)
+
+p1: Person = ...
+p2: Person$ = ...
+p3$: Person = ...
+p4$: Person$ = ...
+
+```
+
+Note: the above statement about ___$ -> ___ vs ___ -> ___$ is incorrect
+
+If you assign a ___$ to a ___, you need to have a guarantee that it didnt get passed off to some other ___$
+
+Maybe this is where "#" comes into play?
+"#" in the return type says "I can be modified",
+and as soon as anything fishy happens where any part of x or children might be given to a "$",
+it turns from a "#" to a "$".
+
+"___#" can be assigned to "___" no problem
+"___" can never be assigned/pass to "___$"
+As soon as anything affects a "#" turning it into a "$", you cant do that anymore
+
+Is there an analogous version of this with "#" in the parameters?
+Is there different rules saving/returning vs passing?
+
+Maybe the key is passing to something that might save it?

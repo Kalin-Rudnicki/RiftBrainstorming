@@ -18,3 +18,108 @@ pureEval => (cant state, cant effect)
 
 what would ".." be?
 what would "..." be?
+
+
+
+Now, there is 1 important distinction between the "acknowledgement" of "!" and "$".
+It will be COMPLETELY acceptable to do stateful operations, and not be required to say you do so, under 1 condition:
+None of those operations were done ON any of the inputs.
+
+In fact, and I think this should overall apply to all of "?"/"!"/"$", you SHOULD NOT be able to "propegate" one of these unless you were forced to.
+This goes back to an earlier example where I might have done something like:
+
+```rift
+
+    res1: Int? = 5
+
+```
+
+ERROR! (warning?) : There is no reason to have a "?" here
+(Same with "!" and "?")
+
+There is 1 edge case, as I (at least at this time) like the idea of sharing acknowledge for "!" and "$".
+
+If there is some block of code that results in a "!$", but the "$" part of it qualifies for the above rule,
+it should (be silently ignored / warning/info saying theres no need to acknowledge it)
+
+Side note:
+1) acknowledge effectfulFunction
+2) acknowledge ~effectfulFunction
+(I think #2, as it goes along with the idea that "Unless you '~', there is be literally no telling its a '!' whatsoever")
+
+
+On top of all of it, I dont think that simply being forced to return a "$" is enough...
+Lets say you have 5 inputs to the function, and get back a "$", whats being changed?
+
+```rift
+
+    // Simple example
+    def addToMap[K, V](map: Map[K, V]$, key: K, value: V): Unit$ = {
+        map << key -> value
+    }
+
+```
+
+Notice how there is a "$" in the return, but also one after the map?
+This tells the caller: I am going to do stateful things to this map
+Now, this makes the idea of only neededing to return "$" if a param is statefully changed much easier.
+1) A param can not be "$" unless you actually do a stateful action on it
+2) You can only return "$" if you do a stateful action that affects a param
+
+Ooo, what about global variables. I think that needs to be expanded to "params or gloabl variables"
+
+Imagine "puts", thats essentially something along the lines of STD_OUT.puts(...)
+
+Another more complicated example is what to do when you want to save a stateful thing
+
+Example:
+
+```rift
+
+    def createSaveReturn(list: List[Person]$): Person = {
+        person: Person = Person("First", "Last")
+        list << person
+        person
+    }
+
+```
+
+Now, we have a deliema here... list has a Person it thinks it can change,
+but the caller of this function things they are getting a stateless Person.
+
+I think that, unlike "?" and "!" that get flattened out, "$" does not.
+Ex: you would never have a "Option[Person?]?", but would "Option[Person$]$" make sense?
+
+```rift
+
+    res1: Option[Person]$ = ...
+    // You can change the value of res1, but not modify the value inside
+    // This tells us that it is ok to assign things to this variable that are not allowed to be changed
+
+    res2: Option[Person$] = ...
+    // You can cange the value inside of res2, but not what res2 points to
+
+    res3: Option[Person$]$ = ...
+    // You can change what res3 points to, and change the internals of either the original value, or anything assigned to it.
+    // This means that this is not allowed:
+
+    res3 = res1
+    // res1 says that "I can not be internally modified"
+
+```
+
+Does it make sense to have these 2 things use different symbols? ($ / #)?
+Not immediately apparent to me, I think 1 would apply to params, and 1 would apply to return values
+
+As far as return values, theres almost 3 options (2?):
+1) It is not acceptable to modify this thing internally
+2) It is ok to modify this thing internally if you want to
+3) Some sort of in-between?
+
+This starts to get really complicated if you look at something like a Person, which you might be able to change their first name, last name, list of friends, favorite food, ...
+How do you specify (Im returning this Person, you can modify its friends, but not its favorite food)?
+
+At that point, I think its probably getting too complex?
+This makes me think that the "$" / "#" is a good idea...
+
+There must be some sound logic here as to being able to reason about this.

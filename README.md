@@ -10,7 +10,8 @@ I would read them in this order:
 2) exceptions.txt
 3) effects.txt
 4) state.txt
-5) dynamic-code.txt
-6) functor-apply-monad.txt
+5) debugging.txt
+6) dynamic-code.txt
+7) functor-apply-monad.txt
 
 The rest from there are somewhat non-essential readings to get the concept

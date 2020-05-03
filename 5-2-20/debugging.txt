@@ -1,0 +1,40 @@
+
+Picture this: Youre working on some code, this "pure" (No "!"/"$") function/method youre working thats 25 stack levels deep, and its having and issue.
+Naturally, you want to print some stuff out to see whats going on, but remember how strict things are with "!",
+that "!" going to have to propegate all the way back up... annoying
+
+Solution: some sort of "debug" keyword
+
+```rift
+
+    def addDebugReturn(i1: Int, i2: Int): Int {
+        // Notice, no "!" required in the return type
+        res: Int = i1 + i2
+        debug puts("Result: $res")
+        res
+    }
+
+```
+
+Debug allows you to essentially ignore a "?" or "!" (should it also ignore "$"?)
+
+Then when compiling, you have 5 (3.5?) (?) options:
+--riftc:debug=on
+--riftc:debug=off (overall default)
+--riftc:debug=optional
+--riftc:debug=optional:on
+--riftc:debug=optional:off (default for optional without specified on/off)
+    Then, when you run your program:
+    --rift:debug=on
+    --rift:debug=off
+    Default is based on optional:___
+
+If some sort of error happens on something that is in debug mode, the program will notify you and then exit
+
+Maybe have some sort of global default flags for running programs with rift
+ex:
+Some sort of env variable like "RIFT_EXPLICIT_DEBUG" (true/false)
+If this is true, and you try and run a program that is either debug=on or debug=optional:on,
+you will get yelled at telling you that this program either "wants to debug" (optional:on) or "has to debug" (on)
+In either case, you can run it with --rift:debug=on, explicitly allowing the debug,
+or in the case of (optional:on), you could run with --rift:debug=off

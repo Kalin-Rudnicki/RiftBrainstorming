@@ -1,0 +1,24 @@
+
+@Entry(subCalls*)
+
+@ArgumentConstrants(...) lets you specify complex relationships between arguments
+you could probably get away with doing a lot of these inline in the params with something like @RequiredIf(otherParam) / @RequiredUnless(otherParam)
+
+Scala did a "better" job with scala-3, allowing you to specify named parameters, with some validation, in its entry-point, 
+but this would be full-fledged "--arg-name 1" "--arg-name=1" "-a=1" argument parsing
+
+What it would do, is: the function itself just takes normal values/objects, so it can be called programatically.
+It would essentially generate another function that takes List[String] and does the parsing,
+as well as any validation for how to get String => T
+Any validations on the actual T would happen in the regular function
+I would want those validations to appear slightly separately though, one being more of a "Program Error" type thing,
+and one being a much more "command line facing error", depending on if its called programmatically or via entry
+This would probably involve generating 2 other functions, and having which one called based on how it was called.
+Technically, this function should be "hidden" from being able to be called in any sort of way dynamically
+
+This is a whole 'nother beast entirely, but would it make sense to have some sort of algebraic constraints, that could then get converted into validations
+
+A function could place algebraic constraints on its inputs, allowing things to be reasoned about.
+Then, the caller has 2 options:
+1) Make sure those constraints are met
+2) Even if the function is "non-?", it becomes "?", as it will do the constraint checks, and error if they fail

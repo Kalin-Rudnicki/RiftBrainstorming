@@ -1,0 +1,20 @@
+
+I think this constitutes something separate than effect, as I think a change in state is probably important to "acknowledge" (see what I did there),
+but not necessarily the same as an "effect"
+
+I would consider an effect to be more of dealing with the outside world,
+and a state change being just that, updating somethings state.
+Those things could both happen at once, or both separately, and should not be coupled.
+
+I would say "$" would be a good symbol for state.
+The same rules would apply to "$" as "!", and I think it would be fair to say that "acknowledge" would be similar enough in this case that it could apply to both.
+
+A (forward) reference (if youre reading this in order) to dynamic code,
+I think the same rules would apply here as well with "$" as "!".
+You would almost need 4 different evals, (can state, cant state) x (can effect, cant effect)
+
+eval => (can state, cant effect)
+pureEval => (cant state, cant effect)
+
+what would ".." be?
+what would "..." be?

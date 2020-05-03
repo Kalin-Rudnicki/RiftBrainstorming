@@ -155,12 +155,12 @@ Lets say you have:
 
 ```rift
 
-class Person(firstName: String, lastName$: String, birthday: Date)
+    class Person(firstName: String, lastName$: String, birthday: Date)
 
-p1: Person = ...
-p2: Person$ = ...
-p3$: Person = ...
-p4$: Person$ = ...
+    p1: Person = ...
+    p2: Person$ = ...
+    p3$: Person = ...
+    p4$: Person$ = ...
 
 ```
 
@@ -181,3 +181,31 @@ Is there an analogous version of this with "#" in the parameters?
 Is there different rules saving/returning vs passing?
 
 Maybe the key is passing to something that might save it?
+
+
+
+With more thought, I think that "#" is exclusive for parameters, representing that something can/will be saved.
+
+```rift
+
+    class Person(/* ... */ firstName: String#, lastName$: String)
+
+```
+
+Timeout...
+
+
+I think the whole "#" on every parameter is a little overboard...
+It definitely gives you a much better sense of whats going on,
+but I think it gets away from one of the main points, of writing enjoyable code, having to deal with those everywhere just seems like a major annoyance.
+
+Heres how I think it goes...
+1) A return type including "$" says:
+    "I can tell you right now... this might get changed"
+2) A return type with no "$" or "#" says:
+    "As far as Im concerned, this has no constraints on it at this point... do what you want with it"
+3) A return type with "#" says:
+    "Hey, I made some guarantee so someone else that this CAN NOT be changed, so you need to abide by that"
+
+If my initial intuition is correct, "" could turn into either "$" or "#", but once you are in either, you are stuck.
+

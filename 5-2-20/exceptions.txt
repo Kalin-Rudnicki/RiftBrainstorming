@@ -186,3 +186,21 @@ This makes me think that it might be a problem to have acknowledge serve the dua
 Just the way this that was naturally phased makes it seem like "propegate" would be a good
 reserved word for the previous definition of "acknowledge" in relation to "?",
 and "acknowledge" stays the same for "!"
+
+
+
+At ANY time, the exact possible errors are all known, none of this b.s. catch-all IoException.
+You CAN match on something like IoError to grab them all at once, but if you ask the compiler, it will tell you exactly.
+Something along the lines of:
+
+```
+
+    IoFailedOpenErr -----+
+                         +----- IoErr ----+
+    IoFailedWriteErr ----+                +----- Err
+                                          |
+    Div0Err ------------------------------+
+
+```
+
+With some special way to display if A < B, but B is not abstract, and A and B were both "thrown" directly.

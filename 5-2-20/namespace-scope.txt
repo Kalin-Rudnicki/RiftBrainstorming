@@ -1,0 +1,63 @@
+
+Similar to java/scala, being within a directory.
+I really dont like this... but I think the first thing in the file needs to be something like java/scala's "package ..."
+Ideally I would like to leave this out, but I think it just just cause for unnecessary unexpected issues.
+
+As a note, "::" is used for namespaces, while "." is used for nested classes:
+
+```rift
+
+class Ex1 {
+
+    class Ex2
+
+}
+
+namespace Ex1 {
+
+    class Ex3
+
+}
+
+// ...
+Ex1.Ex2
+Ex1::Ex3
+
+```
+
+Anytime you go into a directory, you are forced to go into the namespace of whatever that directory is.
+As you can see, it is totally find to have a class and a namespace named the same thing, so you could easily do this as well:
+
+```rift
+
+// : src-root/rift/Ex1.rift
+
+namespace rift
+
+class Ex1 {
+
+    class Ex2
+
+}
+
+
+// : src-root/rift/Ex1/Ex3.rift
+
+namespace rift.Ex1
+
+class Ex3
+
+// from another namespace completely:
+
+rift::Ex1
+rift::Ex1.Ex2
+rift::Ex1::Ex3
+
+```
+
+It is totally fine to do top-level definitions in a file, but EVERYTHING must be inside at least 1 directory. No ".rift" files in the src-root
+
+
+
+classes/traits can have methods or functions.
+namespaces can only have functions.

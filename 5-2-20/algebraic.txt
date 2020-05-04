@@ -1,0 +1,142 @@
+
+Would it be possible (as a stretch goal), to allow algebraic assertions?
+
+First off, as a note, pattern matching is going to be an absolute must. 
+
+Lets look at a "very rough draft" example of what algebraic assertions might look like:
+
+```rift
+
+    // Lets say, for whatever reason, we dont want to be able to end up with a zero length string
+    // Which (I believe) this would guarantee
+    @Assert(list.size > 0)
+    @Assert(join.length > 0)
+    def joinList[T](list: List[T], join: String): String = ...
+
+```
+
+How does this work then? I believe I mentioned this some time earlier (possibly in reference to "exceptions"),
+but it would be totally fine to call this function without the necessary guarantees.
+That being said, if you do so, the compiler will notice, and you will be required to propegate a "?" from that point on.
+Now, the entire point here is that the "?" is as absolutely painless as possible, but none-the-less, you will be required to do so.
+
+That being said, if the compiler is able to reason about the values you are passing into "joinList", 
+then you might not have to end up with a "?"
+
+```rift
+
+    def test(input: String): Unit? = { // We need this, because there is a "?"
+
+        acknowledge ~joinList(List(1, 2), input) // We dont know anything about "input"
+        joinList(List(1, 2), ",") // Now, the compiler knows for sure (because it is able to easiley reason about the literals we gave it)
+
+    }
+
+    // An example of guarantees without literals:
+
+    @Assert(input.length > 0)
+    def test2(input: String): String =
+        joinList(List(1, 2, 3), input)
+
+    // We are able to easily reason about the literal, but we also have a constraint on "input",
+    // which lets us reason about it as well
+    // Now, as far as the caller of "test2" is concerned, they have to either guarantee the "input.length > 0",
+    // or (relatively easily) take the "?" penalty
+
+
+    // Heres the really cool part:
+    joinList(List(1, 2, 3), "") // What happens here?
+    // We actually fail to compile, because the compiler knows for certain we are trying to do something that will fail
+    // No if-and-or-buts about it, this will fail.
+    // Why would you ever allow something like that if you can know for sure?
+
+```
+
+Lets explore an example from a project I was working on recently: B+ Trees
+
+With the nodes, you know certain things, like:
+how many things need to be in the node,
+how many things can be in the node,
+how many keys there are in relation to values
+
+The last one is a big one.
+I was working on pattern matching through the list, going through both at the same time, 
+and it was very annoying to have to do "@unchecked", because the compiler couldnt understand I had really covered all of the cases from an (algebraic?) perspective, even though it might not seem that way.
+
+Lets look at another really common example, zipping 2 lists:
+
+```rift
+
+    class List[T](/* ... */) {
+
+        @Assert(this.size == other.size)
+        def zip[T2](other: List[T2]): List[(T, T2)] = ...
+
+    }
+
+```
+
+I would feel SO MUCH safer working with something like this.
+You can always do the checks yourself, or handle things manually,
+but here, there is so much more logic going on, not leaving things up to the programmer to get it right.
+Again, you could certainly call "zip" without that guarantee, but then you have to propegate the "?"
+
+An interesting thing about lists:
+
+```rift
+
+    list: List[Int] = List(1, 2, 3) // Here, the compiler can reason that list.size == 3
+    list2: List[Int] = list.head // list2.size == 2
+    list3: List[Int] = list2.head // list3.size == 1
+    list4: List[Int] = list3.head // list4.size == 0
+
+    // Then, if we do:
+
+    list5: List[Int] = list4.head
+
+    // If you included this, the program would fail to compile, because it knows for sure that that is going to fail.
+
+```
+
+Now lets look at something like:
+
+```rift
+
+    @Assert(x >= 0)
+    def addToListXTimes[T](list: List[T], x: Int, t: T): List[T] =
+        if (x > 0)
+            addToListXTimes(t :: list, x - 1, t)
+        else
+            list
+
+```
+
+We should be able to reason about this as well...
+It should be able to do this automatically,
+but I would imagine it would also be good to allow the programmer to explicitly state it,
+so that if something is not guaranteed, that they would expect to be, then the compiler will catch them:
+
+```rift
+
+    // "_" in guarantee references return value
+
+    @Assert(x >= 0)
+    @Guarantee(_.length = list.length + x)
+    @TailRec
+    def addToListXTimes[T](list: List[T], x: Int, t: T): List[T] =
+        if (x > 0)
+            addToListXTimes(t :: list, x - 1, t)
+        else
+            list
+
+```
+
+Now I want tail recursion too... Im just asking for everything here...
+
+On the note of Guarantees, I think there are 3 choices:
+1) "@Guarantee(...)"
+    The compiler will enforce that this needs to be true
+2) "@Guarantees"
+    The compiler will attempt to make as many guarantees about the result as possible
+3) Nothing
+    The compiler wont attempt to make any guarantees (much less computationall intensive)

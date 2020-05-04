@@ -1,0 +1,93 @@
+
+An obvious huge part of the type system has already been discussed.
+I guess I would maybe say that the whole deal with "?" is maybe more of a language feature than the type system itself.
+
+I dont think theres a whole lot to say about the type system. I envision it very similar to something like Scala, or even Java (but much nicer to work with).
+
+Here are a few brief ideas in the realm of conversions or implicits:
+
+```rift
+
+    // Paying homage to a trick I used to pull on peoples TI-84's
+    class IntOpts implicitly extends Int {
+
+        def trickyAdd(other: Int): Int =
+            this + other + 1
+
+    }
+
+    // You can now do this, with some sort of import and scoping rules
+5.trickyAdd(7)
+
+```
+
+
+Another side note is that I dont necessarily think I would want to use scalas "with", but it works to get the point accross for now...
+I think I would like to replace "extends" with some sort of "<<" and then use "+" for traits.
+Leave the "<<" out even, if there are only traits? I think its really clear whats going on there, 
+and it would be nice to reserve the "<<" for extending classes.
+
+Maybe even have some sort of "<<|" instead of "implicitly extend".
+Note that you can beef something up with traits as well, 
+
+
+Im still not all too familiar with the concept of type classes,
+but I think this would allow that sort of behavior:
+
+```rift
+
+    trait CanPrint {
+
+        def printMe: Unit?!
+
+    }
+
+    class CanPrintInt <<| Int + CanPrint {
+
+        override def printMe: Unit?! = {
+            println("PrintMe: $toStr")
+        }
+
+    }
+
+```
+
+And taking a shot at functor:
+
+```rift
+
+    // The whole _ thing gets ticky
+    trait Functor[T[A]] {
+
+        def map[B](f: A => B): T[B]
+
+    }
+
+    class OptFunctor[A] <<| Option[A] + Functor[Opt[A]] {
+
+        // This gets a little hairy with pattern matching,
+        // but I think it gets the point across
+
+        // Also, I think Opt would already have someting of that shape defined...
+        // So it might even be fine to just have the definition, without a body even
+
+    }
+
+```
+
+Random note:
+```C
+
+    // I dont even know if this is valid C, but I think its close
+    struct MaybeError {
+        byte errorOrValue;
+        union {
+            error SomeErrorThing,
+            value void *;
+        };
+    }
+
+```
+
+Also, an important note that was mentioned earlier, null is absolutely not a part of the language whatsoever.
+I wonder if I might, for strictly personal reasons, make it a reserved word anyway, just so nobody can use it.

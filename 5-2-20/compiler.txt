@@ -1,0 +1,19 @@
+
+Overall, I would really like to write the compiler tool myself.
+I have a messy, but working version in ruby, that is just missing the last parts of usability...
+but lately I am heavily frowning on anything that without types.
+I dont see that as a viable option here.
+
+Another option would be to re-write it in scala, but I think that would involve at least 1 failed prototype version,
+and would probably total at LEAST a month of work, just to get the compiler tool itself working.
+I am starting to think flex/bison might be a viable option, at least for a first prototype try at the language.
+
+Overall, I think that there are 3 options as far as what rift would compile to:
+1) assembly
+2) C
+3) some sort of VM
+These are ranked in the the order of what I would choose, if I had the choice.
+I think that assembly is the best option, for optimization, as well as flexibility.
+
+The only main concern here is doing things like working with files and sockets.
+I think it is possible to write all that stuff in C, and then have that link with assembly?

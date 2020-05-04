@@ -1,0 +1,7 @@
+
+Maybe this is a useless point, but I think a new name might be in order...
+Originally, I came up with the name as a sense of "bridging the rift of what I like from Java/Ruby/C"
+
+Now, I think the paradigm feels like Im bringing more of my own ideas to the table.
+I am definitely borrowing a lot of ideas, probably most heavily from scala,
+as it is the best (in my opinion, so far)

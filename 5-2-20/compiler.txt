@@ -17,3 +17,7 @@ I think that assembly is the best option, for optimization, as well as flexibili
 
 The only main concern here is doing things like working with files and sockets.
 I think it is possible to write all that stuff in C, and then have that link with assembly?
+
+
+
+Use flex/bison to print out xml of the tokens and such, and call it from scala?

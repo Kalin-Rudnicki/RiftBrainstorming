@@ -5,12 +5,18 @@ This is an opinionated take on what I like/dislike about programming languages,
 and the current state in my mind of what my "ideal programming language" would be.
 
 ---
-# Main Points
+# Table of Contents
 
-`TODO : Links`
+- [Errors](#Errors)  
+- [Assertions](#Assertions)  
+- [Effects](#Effects)  
+- [State](#State)  
+- [Dynamic code evaluation](#Dynamic-code-evaluation)  
+- [Debugging](#Debugging)  
 
 ---
-# Errors ("Exceptions")
+[Table of Contents](#Table-of-Contents)
+# Errors
 
 As far as exceptions go, I am a big fan of javas concept of `Checked Exceptions`, where you force the caller to acknowledge that there might be an error.  
 That being said, the usability aspect is terrible, and just encourages you to do blanket catches or simply throw the error yourself.  
@@ -81,6 +87,7 @@ Any "?" that doesnt affect the return value of the must use the keyword "propega
 A note about what propegate is doing here: if it sees an error, its going to pre-maturely return that error
 
 ---
+[Table of Contents](#Table-of-Contents)
 # Assertions
 
 Now, lets look back at our `mySub` example:
@@ -151,6 +158,7 @@ What happens here? We fail to compile.
 If we know some sort of guaratee about our program, and we know for sure the assertion will fail, why on earth would we let it compile?  
 
 ---
+[Table of Contents](#Table-of-Contents)
 # Effects
 
 Lucky for the reader, this section is much simpler than the one above.
@@ -184,6 +192,7 @@ Any effectful part of the function that doesnt directly impact the result of the
 `If you have a "?!", should "propegate" serve the purpose of acknowledging the "!" ?`
 
 ---
+[Table of Contents](#Table-of-Contents)
 # State
 
 Now, this one is still a little up in the air, as I havent full figured it out yet, but state will use something similar, and we use "$" or "#"
@@ -239,6 +248,7 @@ Now, it is an important distintion to make that having "undecidedly mutability" 
 As soon as something that is undecidedly mutable gets assigned/passed to something that is explicitly mutable/immutable, it is forced to hold that constraint as well.
 
 ---
+[Table of Contents](#Table-of-Contents)
 # Dynamic code evaluation
 
 Being able to do dynamic code evaluation has always been something that is very important to me. I love my meta-programming. I would ideally like to get to the point where you can dynamically define "dynamic classes" and do all sorts of fun stuff with it, but I think that is a stretch goal for way down the line.  
@@ -263,6 +273,7 @@ res5: String? = person..lastName.cast[String].capitalize // => "LAST"
 ```
 
 ---
+[Table of Contents](#Table-of-Contents)
 # Debugging
 
 I think it will be important to have some sort of "debug" (probably with a more unique name).  

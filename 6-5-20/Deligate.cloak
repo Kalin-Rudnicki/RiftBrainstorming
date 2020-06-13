@@ -1,0 +1,24 @@
+
+// Do I like the keyword class?
+
+@Assert(hour < 24)
+@Assert(minute < 60)
+@Assert(second < 60)
+@Assert(ms < 1000)
+class Time(hour: UByte, minute: UByte, second: UByte, ms: UShort) {
+
+    method msIntoDay -> UInt =
+        ((hour.toUInt * 60 + minute.toUInt) * 60).to
+
+}
+
+@Assert(month < 12)
+@Assert(day < 31)
+class Date(year: Short, month: UByte, day: UByte) {
+
+    method dayOfYear -> UByte = ???
+
+}
+
+
+class DateTime(@Delegate date: Date, @Delegate time: Time)

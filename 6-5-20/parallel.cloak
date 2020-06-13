@@ -1,0 +1,18 @@
+
+function test(i1: Int, i2: Int) -> String = {
+    // Single threaded
+    r0: Int <- i1 + i2     // No ?, think of as "="
+    r1: Int? <~ i1 / i2    // ?, but "acknowledge" the error
+
+    r2: Int <<- i2 / i2    // ?, applied over (think of ado) : "If I fail, I can keep going, but as soon as my value is needed, I need to have worked"
+                           // Allows for accumulation of errors
+
+    r3: Int <<<- i1 / i2   // ?, mapped/flatMapped over (think of for/do comprehension) : "This needs to work for me to continue"
+
+    // Multi threaded
+    // What are the requirements here? Every part of the expr is immutable?
+    r4: Int <-- i1 + i2    // Run on another thread, join once the value is needed
+    r5: Int <<-- i1 + i2   // Run on another thread, join & apply over once the value is needed
+}
+
+// Starting a thread, and not joining on it is a "!"

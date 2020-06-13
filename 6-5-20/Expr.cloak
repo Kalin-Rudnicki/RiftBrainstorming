@@ -1,0 +1,4 @@
+
+function doThing(a1: Expr[String]) -> String = // (Expr[String] -> String)
+    // Expects an expression that evaluates to a String
+    // Is called in the same way as (String -> String), except the parsed tree is passed, instead of the String itself

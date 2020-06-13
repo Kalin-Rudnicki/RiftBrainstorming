@@ -1,0 +1,39 @@
+
+typeclass Functor[F[_]] {
+
+    function functorMap[A](self: F[A]) -> map[B](f: A -> B) -> F[B]
+
+}
+
+typeclass Applicative[F[_]] + Functor[F] {
+
+    // You can specify a typeclass "F" {0, 1} times.
+    // function / method ?
+    // Whether a type param is part of the first param list, and that param list has only 1 param (aka: can be "implicitly" called)
+    function applicativeLift[A](self: A) -> lift[F] -> F[A]
+
+    function applicativeApply[A, B](f: F[A -> B]) -> (self: F[A]) -> F[B]
+
+}
+
+// fAB.lift[Option](sFA)   => Option[B]
+
+typeclass Monad[F[_]] + Applicative[F] {
+
+    function monadFlatten[A](self: F[F[A]]) -> flatten -> F[A]
+
+
+    function monadFlatMap[A](self: F[A]) -> flatMap[B](f: A -> F[B]) -> F[B] =
+        self.map(f).flatten
+
+    function monadFlatApply[A, B]()
+
+}
+
+// Every line needs to either be saved to a variable/_, or be the last statement in the block
+
+typeclass ImplicitConversion[A, B] {
+
+    function ~ convert[A](self: A) -> B
+
+}
